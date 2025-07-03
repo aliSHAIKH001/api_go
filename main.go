@@ -16,13 +16,15 @@ func main() {
 	flag.IntVar(&port, "port", 8080, "go backend server port")
 	flag.Parse()
 
-
+	// All our logic is encapsulated in the struct returned by NewApplication constructor 
 	app, err := app.NewApplication()
 	if err != nil {
 		panic(err)
 	}
+	// To avoid loose and Open connections
+	defer app.DB.Close()
 
-
+	
 	r := routes.SetupRoutes(app)
 	server := &http.Server{
 		Addr: fmt.Sprintf(":%d", port),
