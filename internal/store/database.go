@@ -22,6 +22,7 @@ func Open() (*sql.DB, error) {
 
 
 func MigrateFS(db *sql.DB, migrationsFs fs.FS, dir string) error {
+	// This tells Goose to use an embedded file system instead of reading SQL files from disk.
 	goose.SetBaseFS(migrationsFs)
 
 	defer func() {
@@ -37,6 +38,7 @@ func Migrate(db *sql.DB, dir string) error {
 		return fmt.Errorf("Migrate: %w", err)
 	}
 
+	// Regardless of embedded file system or not, goose still needs to know the path.
 	err = goose.Up(db, dir)
 	if err != nil {
 		return fmt.Errorf("goose up: %w", err)

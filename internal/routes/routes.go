@@ -5,6 +5,7 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
+// Simple router that links to different handlers which originate from the API folder
 func SetupRoutes(app *app.Application) *chi.Mux {
 	r := chi.NewRouter()
 

@@ -24,7 +24,8 @@ func NewApplication() (*Application, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	
+	// Sets up the structure of our database with migration files.
 	err = store.MigrateFS(pgDB, migrations.FS, ".")
 	if err != nil {
 		panic(err)
@@ -34,9 +35,10 @@ func NewApplication() (*Application, error) {
 	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
 
 	// Stores will belong here
+	workoutStore := store.NewPostgresWorkoutStore(pgDB)
 
 	// Handlers will belong here
-	workoutHandler := api.NewWorkoutHandler()
+	workoutHandler := api.NewWorkoutHandler(workoutStore)
 
 	app := &Application{
 		Logger: logger,
