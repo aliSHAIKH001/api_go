@@ -35,9 +35,11 @@ func NewApplication() (*Application, error) {
 	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
 
 	// Stores will belong here
+	// This gives us a struct with the capability to perform crud operations on the database.
 	workoutStore := store.NewPostgresWorkoutStore(pgDB)
 
 	// Handlers will belong here
+	// The struct above is used by the handler depending on the requests we recieve
 	workoutHandler := api.NewWorkoutHandler(workoutStore)
 
 	app := &Application{
