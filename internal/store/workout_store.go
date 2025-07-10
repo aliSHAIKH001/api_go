@@ -107,7 +107,7 @@ func (pg *PostgresWorkoutStore) GetWorkoutByID(id int64) (*Workout, error) {
 		return nil, err
 	}
 	defer rows.Close()
-	
+	// We loop through all the rows returned and then we scan the values of each row into the temporary entry variable.
 	for rows.Next() {
 		var entry WorkoutEntry
 		err = rows.Scan(

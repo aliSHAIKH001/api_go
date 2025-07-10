@@ -40,7 +40,7 @@ func NewApplication() (*Application, error) {
 
 	// Handlers will belong here
 	// The struct above is used by the handler depending on the requests we recieve
-	workoutHandler := api.NewWorkoutHandler(workoutStore)
+	workoutHandler := api.NewWorkoutHandler(workoutStore, logger)
 
 	app := &Application{
 		Logger: logger,
