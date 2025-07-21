@@ -3,23 +3,23 @@ package store
 import "database/sql"
 
 type Workout struct {
-	ID int `json:"id"`
-	Title string `json:"title"`
-	Description string `json:"description"`
-	DurationMinutes int `json:"duration_minutes"`
-	CaloriesBurned int `json:"calories_burned"`
-	Entries []WorkoutEntry `json:"entries"`
+	ID              int            `json:"id"`
+	Title           string         `json:"title"`
+	Description     string         `json:"description"`
+	DurationMinutes int            `json:"duration_minutes"`
+	CaloriesBurned  int            `json:"calories_burned"`
+	Entries         []WorkoutEntry `json:"entries"`
 }
 
 type WorkoutEntry struct {
-	ID int `json:"id"`
-	ExerciseName string `json:"exercise_name"`
-	Sets int `json:"sets"`
-	Reps *int `json:"reps"`
-	DurationSeconds *int `json:"duration_seconds"`
-	Weight *float64 `json:"weight"`
-	Notes string `json:"Notes"`
-	OrderIndex int `json:"order_index"`
+	ID              int      `json:"id"`
+	ExerciseName    string   `json:"exercise_name"`
+	Sets            int      `json:"sets"`
+	Reps            *int     `json:"reps"`
+	DurationSeconds *int     `json:"duration_seconds"`
+	Weight          *float64 `json:"weight"`
+	Notes           string   `json:"Notes"`
+	OrderIndex      int      `json:"order_index"`
 }
 
 type PostgresWorkoutStore struct {
@@ -34,10 +34,9 @@ func NewPostgresWorkoutStore(db *sql.DB) *PostgresWorkoutStore {
 type WorkoutStore interface {
 	CreateWorkout(*Workout) (*Workout, error)
 	GetWorkoutByID(id int64) (*Workout, error)
-	UpdateWorkout(*Workout) error 
+	UpdateWorkout(*Workout) error
 	DeleteWorkout(id int64) error
 }
-
 
 func (pg *PostgresWorkoutStore) CreateWorkout(workout *Workout) (*Workout, error) {
 	tx, err := pg.db.Begin()
@@ -48,8 +47,8 @@ func (pg *PostgresWorkoutStore) CreateWorkout(workout *Workout) (*Workout, error
 	// This defer is conditional
 	defer tx.Rollback()
 
-	query := 
-	`
+	query :=
+		`
 	INSERT INTO workouts (title, description, duration_minutes, calories_burned)
 	VALUES ($1, $2, $3, $4)
 	RETURNING id 
@@ -170,7 +169,7 @@ func (pg *PostgresWorkoutStore) UpdateWorkout(workout *Workout) error {
 			entry.Sets,
 			entry.Reps,
 			entry.DurationSeconds,
-			entry.Weight, 
+			entry.Weight,
 			entry.Notes,
 			entry.OrderIndex,
 		)
@@ -187,17 +186,17 @@ func (pg *PostgresWorkoutStore) DeleteWorkout(id int64) error {
   DELETE from workouts
   WHERE id = $1
   `
-  result, err := pg.db.Exec(query, id)
-  if err != nil {
-	return err
-  }
-  rowsAffected, err := result.RowsAffected()
-  if err != nil {
-	return err
-  }
-  if rowsAffected == 0 {
-	return sql.ErrNoRows
-  }
+	result, err := pg.db.Exec(query, id)
+	if err != nil {
+		return err
+	}
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowsAffected == 0 {
+		return sql.ErrNoRows
+	}
 
-  return nil
+	return nil
 }

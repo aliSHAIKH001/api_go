@@ -13,9 +13,11 @@ import (
 )
 
 type Application struct {
-	Logger *log.Logger
+	Logger         *log.Logger
 	WorkoutHandler *api.WorkoutHandler
-	DB *sql.DB
+	UserHandler    *api.UserHandler
+	TokenHandler   *api.TokenHandler
+	DB             *sql.DB
 }
 
 func NewApplication() (*Application, error) {
@@ -24,7 +26,7 @@ func NewApplication() (*Application, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	// Sets up the structure of our database with migration files.
 	err = store.MigrateFS(pgDB, migrations.FS, ".")
 	if err != nil {
@@ -37,21 +39,26 @@ func NewApplication() (*Application, error) {
 	// Stores will belong here
 	// This gives us a struct with the capability to perform crud operations on the database.
 	workoutStore := store.NewPostgresWorkoutStore(pgDB)
+	userStore := store.NewPostgresUserStore(pgDB)
+	tokenStore := store.NewPostgresTokenStore(pgDB)
 
 	// Handlers will belong here
 	// The struct above is used by the handler depending on the requests we recieve
 	workoutHandler := api.NewWorkoutHandler(workoutStore, logger)
+	userHandler := api.NewUserHandler(userStore, logger)
+	tokenHandler := api.NewTokenHandler(tokenStore, userStore, logger)
 
 	app := &Application{
-		Logger: logger,
+		Logger:         logger,
 		WorkoutHandler: workoutHandler,
-		DB: pgDB,
+		UserHandler:    userHandler,
+		TokenHandler:   tokenHandler,
+		DB:             pgDB,
 	}
 
 	return app, nil
 }
 
-
-func (a *Application) HealthCheck(w http.ResponseWriter,  r *http.Request) {
+func (a *Application) HealthCheck(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Status is available\n")
 }
