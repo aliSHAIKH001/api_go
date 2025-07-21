@@ -9,16 +9,25 @@ import (
 func SetupRoutes(app *app.Application) *chi.Mux {
 	r := chi.NewRouter()
 
-	r.Get("/health", app.HealthCheck)
-	r.Get("/workouts/{id}", app.WorkoutHandler.HandleGetWorkoutById)
+	r.Group(func(r chi.Router) {
+		// This middleware will be applied to all routes in this group.
+		// It will set the user , either anonymous or authenticated, in the request context.
+		r.Use(app.Middleware.Authenticate)
 
-	r.Post("/workouts", app.WorkoutHandler.HandleCreateWorkout)
+		// These routes are all wrapped in requireUser middleware to check if the user is authenticated.
+		r.Get("/workouts/{id}", app.Middleware.RequireUser(app.WorkoutHandler.HandleGetWorkoutById))
+		r.Post("/workouts", app.Middleware.RequireUser(app.WorkoutHandler.HandleCreateWorkout))
+		r.Put("/workouts/{id}", app.Middleware.RequireUser(app.WorkoutHandler.HandleUpdateWorkoutByID))
+		r.Delete("/workouts/{id}", app.Middleware.RequireUser(app.WorkoutHandler.HandleDeleteWorkoutByID))
+	})
+
+	r.Get("/health", app.HealthCheck)
 	r.Post("/users", app.UserHandler.HandleRegisterUser)
 	r.Post("/tokens/authentication", app.TokenHandler.HandleCreateToken)
 
-	r.Put("/workouts/{id}", app.WorkoutHandler.HandleUpdateWorkoutByID)
-
-	r.Delete("/workouts/{id}", app.WorkoutHandler.HandleDeleteWorkoutByID)
-
 	return r
 }
+
+// PPDPSEBD6CFFGUWOSZNHKPO46BM6LMT6QLXDPZGHHG3P74LXSOFQ for melkey
+
+// LUDPPYYZV6QL6FMEFDVFKP4727W3WGILH3WYE2OQP2NE5MNQ7NFQ for dustin

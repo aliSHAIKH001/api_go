@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/aliSHAIKH001/api_go/internal/api"
+	"github.com/aliSHAIKH001/api_go/internal/middleware"
 	"github.com/aliSHAIKH001/api_go/internal/store"
 	"github.com/aliSHAIKH001/api_go/migrations"
 )
@@ -17,6 +18,7 @@ type Application struct {
 	WorkoutHandler *api.WorkoutHandler
 	UserHandler    *api.UserHandler
 	TokenHandler   *api.TokenHandler
+	Middleware     middleware.UserMiddleware
 	DB             *sql.DB
 }
 
@@ -48,11 +50,17 @@ func NewApplication() (*Application, error) {
 	userHandler := api.NewUserHandler(userStore, logger)
 	tokenHandler := api.NewTokenHandler(tokenStore, userStore, logger)
 
+	// Middleware will belong here
+	middlewareHandler := middleware.UserMiddleware{
+		UserStore: userStore,
+	}
+
 	app := &Application{
 		Logger:         logger,
 		WorkoutHandler: workoutHandler,
 		UserHandler:    userHandler,
 		TokenHandler:   tokenHandler,
+		Middleware:     middlewareHandler,
 		DB:             pgDB,
 	}
 

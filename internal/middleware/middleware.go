@@ -74,3 +74,17 @@ func (um *UserMiddleware) Authenticate(next http.Handler) http.Handler {
 	})
 
 }
+
+// Middleware to check if the user is authenticated and behaves accordingly.
+func (um *UserMiddleware) RequireUser(next http.HandlerFunc) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		user := GetUser(r)
+
+		if user.IsAnonymous() {
+			utils.WriteJSON(w, http.StatusUnauthorized, utils.Envelope{"error": "you must be logged in to access this route"})
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
